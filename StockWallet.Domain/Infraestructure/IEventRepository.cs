@@ -2,7 +2,7 @@ using StockWallet.Domain.Models;
 
 namespace StockWallet.Domain.Infraestructure;
 
-public interface IEventRepository
+public interface IEventRepository: IDisposable
 {
     StockEvent Get(int id);
     List<StockEvent> AllWallet(int id);
