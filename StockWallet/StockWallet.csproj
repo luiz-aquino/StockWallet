@@ -17,4 +17,9 @@
       </Content>
     </ItemGroup>
 
+
+    <ItemGroup>
+      <ProjectReference Include="..\StockWallet.Db.Mysql\StockWallet.Db.Mysql.csproj" />
+    </ItemGroup>
+
 </Project>
