@@ -14,7 +14,7 @@ public class WalletController : ControllerBase
         _walletService = walletService;
     }
 
-    [HttpGet, Route(""), Produces("text/json", Type = typeof(Wallet))]
+    [HttpGet, Route("all"), Produces("text/json", Type = typeof(Wallet))]
     public async Task<IActionResult> Get()
     {
         var companies = await _walletService.All();

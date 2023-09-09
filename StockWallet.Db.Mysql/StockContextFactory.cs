@@ -9,7 +9,7 @@ public class StockContextFactory: IDesignTimeDbContextFactory<StockWalletContext
     {
         var optionsBuilder = new DbContextOptionsBuilder<StockWalletContext>();
 
-        string connectionString = Environment.GetEnvironmentVariable("ConnectionStrings_Default") ?? "Server=localhost; User ID=root; Password=pass; Database=blog";
+        string connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__Default") ?? "Server=localhost; User ID=root; Password=pass; Database=blog";
         optionsBuilder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
         
         return new StockWalletContext(optionsBuilder.Options);

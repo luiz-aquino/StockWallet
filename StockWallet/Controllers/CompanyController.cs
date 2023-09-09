@@ -14,7 +14,7 @@ public class CompanyController : ControllerBase
         _companyService = companyService;
     }
 
-    [HttpGet, Route(""), Produces("text/json", Type = typeof(Company))]
+    [HttpGet, Route("all"), Produces("text/json", Type = typeof(Company))]
     public async Task<IActionResult> Get()
     {
         var companies = await _companyService.All();

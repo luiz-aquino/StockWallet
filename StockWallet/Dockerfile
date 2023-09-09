@@ -12,10 +12,10 @@ RUN rm -rf "StockWallet.Domain/bin StockWallet.Domain/obj"
 
 RUN dotnet restore -r linux-musl-x64 "StockWallet/StockWallet.csproj"
 WORKDIR "/src/StockWallet"
-RUN dotnet build "StockWallet.csproj" -c Release -r linux-musl-x64  --self-contained -o /app/build
+RUN dotnet build "StockWallet.csproj" -c Release -r linux-musl-x64  --no-self-contained -o /app/build
 
 FROM build AS publish
-RUN dotnet publish "StockWallet.csproj" -c Release -r linux-musl-x64 --self-contained -o /app/publish /p:UseAppHost=false
+RUN dotnet publish "StockWallet.csproj" -c Release -r linux-musl-x64 --no-self-contained -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 WORKDIR /app
