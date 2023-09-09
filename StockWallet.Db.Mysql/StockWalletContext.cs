@@ -12,10 +12,10 @@ public class StockWalletContext: DbContext
         
     }
 
-    public DbSet<Wallet>? Wallets { get; set; }
-    public DbSet<Company>? Companies { get; set; }
-    public DbSet<StockEvent>? StockEvents { get; set; }
-    public DbSet<StockSummary>? Summaries { get; set; }
+    public DbSet<Wallet> Wallets { get; set; }
+    public DbSet<Company> Companies { get; set; }
+    public DbSet<StockEvent> StockEvents { get; set; }
+    public DbSet<StockSummary> Summaries { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -12,8 +12,4 @@ public class CompanyService : ICompanyService
         _companyRepository = repository;
     }
 
-    public void Dispose()
-    {
-        _companyRepository.Dispose();
-    }
 }

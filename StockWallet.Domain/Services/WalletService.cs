@@ -12,8 +12,4 @@ public class WalletService: IWalletService
         _walletRepository = repository;
     }
 
-    public void Dispose()
-    {
-        _walletRepository.Dispose();
-    }
 }

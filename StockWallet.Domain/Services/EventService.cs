@@ -11,8 +11,4 @@ public class EventService: IEvenService
         _eventRepository = eventRepository;
     }
 
-    public void Dispose()
-    {
-        _eventRepository.Dispose();
-    }
 }

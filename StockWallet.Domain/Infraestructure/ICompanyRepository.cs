@@ -2,12 +2,11 @@ using StockWallet.Domain.Models;
 
 namespace StockWallet.Domain.Infraestructure;
 
-public interface ICompanyRepository: IDisposable
+public interface ICompanyRepository
 {
-    Company Get(int id);
-    (bool success, string error) Remove(int id);
+    Task<(Company company, string error)> Get(int id);
+    Task<(bool success, string error)> Remove(int id);
     
-    (bool success, string error) Insert(Company item);
-    List<Company> All();
-
+    Task<(bool success, string error)> Insert(Company item);
+    Task<(List<Company> companies, string error)> All();
 }

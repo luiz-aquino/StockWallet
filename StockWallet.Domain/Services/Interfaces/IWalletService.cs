@@ -1,6 +1,6 @@
 namespace StockWallet.Domain.Services.Interfaces;
 
-public interface IWalletService: IDisposable
+public interface IWalletService
 {
     
 }

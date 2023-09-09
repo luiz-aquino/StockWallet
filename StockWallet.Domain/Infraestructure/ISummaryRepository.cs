@@ -2,10 +2,10 @@ using StockWallet.Domain.Models.Serivces;
 
 namespace StockWallet.Domain.Infraestructure;
 
-public interface ISummaryRepository: IDisposable
+public interface ISummaryRepository
 {
-    StockSummary Get(int id);
-    List<StockSummary> All(int walletId);
+    Task<(StockSummary summary, string error)> Get(int id);
+    Task<(List<StockSummary> summaries, string error)> All(int walletId);
 
-    (bool success, string error) Insert(StockSummary item);
+    Task<(bool success, string error)> Insert(StockSummary item);
 }

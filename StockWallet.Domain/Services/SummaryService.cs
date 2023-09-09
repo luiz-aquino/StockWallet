@@ -12,8 +12,4 @@ public class SummaryService: ISummaryService
         _summaryRepository = summaryRepository;
     }
 
-    public void Dispose()
-    {
-        _summaryRepository.Dispose();
-    }
 }
