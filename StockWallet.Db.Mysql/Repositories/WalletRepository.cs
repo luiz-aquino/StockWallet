@@ -32,7 +32,7 @@ public class WalletRepository: IWalletRepository
         return (wallet ?? new Wallet(), error);
     }
 
-    public async  Task<(bool success, string error)> Delete(int id)
+    public async Task<(bool success, string error)> Delete(int id)
     {
         string error = string.Empty;
 
@@ -52,13 +52,38 @@ public class WalletRepository: IWalletRepository
         return (string.IsNullOrEmpty(error), error);
     }
 
-    public async  Task<(List<Wallet> wallets, string error)> All()
+    public async Task<(List<Wallet> wallets, string error)> All()
     {
-        throw new NotImplementedException();
+        string error = string.Empty;
+        var wallets = new List<Wallet>(0);
+
+        try
+        {
+            wallets = await _context.Wallets.ToListAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        
+        return (wallets, error);
     }
 
-    public async  Task<(bool success, string error)> Insert(Wallet item)
+    public async Task<(bool success, string error)> Insert(Wallet item)
     {
-        throw new NotImplementedException();
+        string error = string.Empty;
+
+        try
+        {
+            _context.Wallets.Attach(item);
+
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+
+        return (string.IsNullOrEmpty(error), error);
     }
 }
