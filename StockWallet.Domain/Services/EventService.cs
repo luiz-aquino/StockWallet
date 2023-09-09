@@ -4,7 +4,7 @@ using StockWallet.Domain.Services.Interfaces;
 
 namespace StockWallet.Domain.Services;
 
-public class EventService: IEvenService
+public class EventService: IEventService
 {
     private readonly IEventRepository _eventRepository;
     public EventService(IEventRepository eventRepository)

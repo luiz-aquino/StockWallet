@@ -2,7 +2,7 @@ using StockWallet.Domain.Models;
 
 namespace StockWallet.Domain.Services.Interfaces;
 
-public interface IEvenService
+public interface IEventService
 {
     Task<(StockEvent stockEvent, string error)> Get(int id);
     Task<(List<StockEvent> stockEvents, string error)> AllWallet(int id);
