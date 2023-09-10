@@ -58,45 +58,72 @@ public class SummaryService: ISummaryService
 
     public async Task<(bool success, string error)> Process()
     {
-        bool success = true;
         string error = string.Empty;
 
-        (List<Wallet> wallets, string _) = await _walletRepository.All();
-
-        foreach (var wallet in wallets)
+        try
         {
-            (List<int> companies, string _) = await _eventRepository.WalletCompanies(wallet.WalletId);
+            (List<Wallet> wallets, string _) = await _walletRepository.All();
 
-            (List<StockSummary> summaries, string _) = await _summaryRepository.All(wallet.WalletId);
-
-            var filters = companies.Select(x => new StockEventFilter
+            foreach (var wallet in wallets)
             {
-                CompanyId = x,
-                LastEventId = summaries.Where(s => s.CompanyId == x)
-                    .Select(s => s.LastProcessedId)
-                    .FirstOrDefault()
-            }).ToList();
+                (List<int> companies, string _) = await _eventRepository.WalletCompanies(wallet.WalletId);
 
-            (List<StockEvent> stockEvents, string _) = await _eventRepository.WalletEvents(wallet.WalletId, filters);
+                (List<StockSummary> summaries, string _) = await _summaryRepository.All(wallet.WalletId);
 
-            var updatedSummaries = new List<StockSummary>(companies.Count);
-            var summariesToInsert = new List<StockSummary>(companies.Count);
-            foreach (var companyId in companies)
-            {
-                StockSummary summary = summaries.FirstOrDefault(x => x.CompanyId == companyId) ?? new StockSummary
+                (List<StockEvent> stockEvents, string _) = await _eventRepository.WalletEvents(wallet.WalletId, companies);
+
+                var updatedSummaries = new List<StockSummary>(companies.Count);
+                var summariesToInsert = new List<StockSummary>(companies.Count);
+                foreach (var companyId in companies)
                 {
-                    WalletId = wallet.WalletId,
-                    CompanyId = companyId,
-                    CreatedAt = DateTime.Now
-                };
+                    StockSummary summary = summaries.FirstOrDefault(x => x.CompanyId == companyId) ?? new StockSummary
+                    {
+                        WalletId = wallet.WalletId,
+                        CompanyId = companyId,
+                        CreatedAt = DateTime.Now
+                    };
 
-                List<StockEvent> currentEvents = stockEvents.Where(x => x.CompanyId == companyId).ToList();
-                
-                
-            }
+                    List<StockEvent> currentEvents = stockEvents.Where(x => x.CompanyId == companyId).ToList();
 
-        } 
+                    int quantity = currentEvents.Sum(x => x.Quantity);
+                    decimal totalPrice = currentEvents.Sum(x => x.Price * x.Quantity);
+                    
+                    summary.AveragePrice = (summary.AveragePrice * summary.Quantity) + (totalPrice) / (quantity + summary.Quantity);
+                    summary.Quantity += quantity;
+
+                    summary.LastProcessedId = currentEvents.OrderBy(x => x.EventId).Select(x => x.EventId).LastOrDefault();
+                    
+                    if (summary.SummaryId == 0)
+                    {
+                        summariesToInsert.Add(summary);
+                    }
+                    else if(DateTime.Now.Date.Subtract(summary.CreatedAt.Date) >= TimeSpan.FromDays(1))
+                    {
+                        summariesToInsert.Add(new StockSummary
+                        {
+                            WalletId = summary.WalletId,
+                            CompanyId = summary.CompanyId,
+                            CreatedAt = summary.CreatedAt,
+                            AveragePrice = summary.AveragePrice,
+                            Quantity = summary.Quantity,
+                            LastProcessedId = summary.LastProcessedId
+                        });
+                    }
+                    else
+                    {
+                        updatedSummaries.Add(summary);
+                    }
+
+                    if (summariesToInsert.Any()) await _summaryRepository.Insert(summariesToInsert);
+                    if (updatedSummaries.Any()) await _summaryRepository.Update(updatedSummaries);
+                }
+            } 
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
         
-        return (success, error);
+        return (string.IsNullOrEmpty(error), error);
     }
 }

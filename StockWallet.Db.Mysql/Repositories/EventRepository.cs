@@ -125,15 +125,16 @@ public class EventRepository: IEventRepository
         return (companies, error);
     }
 
-    public async Task<(List<StockEvent> stockEvents, string error)> WalletEvents(int walletId, List<StockEventFilter> filters)
+    public async Task<(List<StockEvent> stockEvents, string error)> WalletEvents(int walletId, List<int> companies)
     {
         string error = string.Empty;
         var stockEvents = new List<StockEvent>(0);
 
         try
-        {
+        {   
             stockEvents = await _context.StockEvents.Where(x =>
-                    x.WalletId == walletId && filters.Any(f => f.CompanyId == x.CompanyId && f.LastEventId < x.EventId))
+                    x.WalletId == walletId && companies.Contains(x.CompanyId) 
+                                           && !x.Wallet.Summaries.Any(s => s.CompanyId == x.CompanyId && s.LastProcessedId == x.EventId))
                 .ToListAsync();
         }
         catch (Exception e)

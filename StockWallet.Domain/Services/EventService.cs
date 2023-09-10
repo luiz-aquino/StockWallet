@@ -25,6 +25,8 @@ public class EventService: IEventService
         dto.EventType = stockEvent.EventType;
         dto.Price = stockEvent.Price;
         dto.Quantity = stockEvent.Quantity;
+        dto.WalletId = stockEvent.WalletId;
+        dto.CompanyId = stockEvent.CompanyId;
         
         return (dto, error);
     }
@@ -42,7 +44,9 @@ public class EventService: IEventService
             EventId = x.EventId,
             EventType = x.EventType,
             Price = x.Price,
-            Quantity = x.Quantity
+            Quantity = x.Quantity,
+            CompanyId = x.CompanyId,
+            WalletId = x.WalletId
         }));
         
         return (dtos, error);
@@ -61,7 +65,9 @@ public class EventService: IEventService
             EventId = x.EventId,
             EventType = x.EventType,
             Price = x.Price,
-            Quantity = x.Quantity
+            Quantity = x.Quantity,
+            CompanyId = x.CompanyId,
+            WalletId = x.WalletId
         }));
         
         return (dtos, error);
@@ -73,7 +79,9 @@ public class EventService: IEventService
         {
             EventType = item.EventType,
             Price = item.Price,
-            Quantity = item.Quantity
+            Quantity = item.Quantity,
+            CompanyId = item.CompanyId,
+            WalletId = item.WalletId
         };
         
         (bool success, string error) = await _eventRepository.Insert(stockEvent);

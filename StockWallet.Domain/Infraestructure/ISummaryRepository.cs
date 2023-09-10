@@ -8,4 +8,6 @@ public interface ISummaryRepository
     Task<(List<StockSummary> summaries, string error)> All(int walletId);
 
     Task<(bool success, string error)> Insert(StockSummary item);
+    Task<(bool success, string error)> Insert(List<StockSummary> items);
+    Task<(bool success, string error)> Update(List<StockSummary> items);
 }

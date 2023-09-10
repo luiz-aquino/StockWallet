@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using StockWallet.Db.Mysql.Utils;
 using StockWallet.Domain.Infraestructure;
 using StockWallet.Domain.Models.Serivces;
 
@@ -68,6 +69,50 @@ public class SummaryRepository: ISummaryRepository
             error = e.Message;
         }
 
+        return (string.IsNullOrEmpty(error), error);
+    }
+
+    public async Task<(bool success, string error)> Insert(List<StockSummary> items)
+    {
+        string error = string.Empty;
+
+        try
+        {
+            _context.Summaries.AttachRange(items);
+
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        
+        return (string.IsNullOrEmpty(error), error);
+    }
+
+    public async Task<(bool success, string error)> Update(List<StockSummary> items)
+    {
+        string error = string.Empty;
+
+        try
+        {
+            var notTracked = items.Where(x => _context.IsTracked(x)).ToList();
+            
+            if(notTracked.Any()) _context.Summaries.AttachRange(notTracked);
+
+            foreach (var summary in notTracked)
+            {
+                var entry = _context.Entry(summary);
+                entry.State = EntityState.Modified;
+            }
+
+            await _context.SaveChangesAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+        
         return (string.IsNullOrEmpty(error), error);
     }
 }
