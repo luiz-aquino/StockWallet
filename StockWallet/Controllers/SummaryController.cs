@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using StockWallet.Domain.Models.Dtos;
 using StockWallet.Domain.Services.Interfaces;
 
 namespace StockWallet.Controllers;
@@ -13,9 +14,11 @@ public class SummaryController : ControllerBase
         _summaryService = summaryService;
     }
     
-    // GET
-    public IActionResult Index()
+    [HttpGet, Route("wallet/id/{id}"), Produces("application/json", Type = typeof(List<SummaryDto>))]
+    public async Task<IActionResult> Get(int id)
     {
-        return Ok();
+        (List<SummaryDto> summaries, string _) = await _summaryService.All(id);
+        
+        return Ok(summaries);
     }
 }

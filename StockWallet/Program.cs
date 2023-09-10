@@ -17,6 +17,7 @@ builder.Services.RegisterRepositories();
 builder.Services.RegisterServices();
 
 string connectionString = builder.Configuration["ConnectionStrings:Default"] ?? "Server=localhost; User ID=root; Password=pass; Database=blog";
+connectionString = connectionString.Replace("\"", string.Empty);
 builder.Services.AddDbContext<StockWalletContext>(x => x.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
 
 var app = builder.Build();

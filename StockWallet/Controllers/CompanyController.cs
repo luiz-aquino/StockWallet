@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
-using StockWallet.Domain.Models;
+using StockWallet.Domain.Models.Dtos;
 using StockWallet.Domain.Services.Interfaces;
+using StockWallet.Models;
 
 namespace StockWallet.Controllers;
 
@@ -14,16 +15,37 @@ public class CompanyController : ControllerBase
         _companyService = companyService;
     }
 
-    [HttpGet, Route("all"), Produces("text/json", Type = typeof(Company))]
+    [HttpGet, Route("all"), Produces("application/json", Type = typeof(List<CompanyDto>))]
     public async Task<IActionResult> Get()
-    {
-        var companies = await _companyService.All();
+    { 
+        (List<CompanyDto> companies, string _) = await _companyService.All();
+        
         return Ok(companies);
     }
-    
-    // GET
-    public IActionResult Index()
+
+    [HttpGet, Route("id/{id}"), Produces("application/json", Type = typeof(CompanyDto))]
+    public async Task<IActionResult> Get(int id)
     {
-        return Ok();
+        (CompanyDto company, string _) = await _companyService.Get(id);
+
+        return Ok(company);
+    }
+
+    [HttpPost, Produces("application/Json", Type = typeof(InsertResult))]
+    public async Task<IActionResult> Post([FromBody] CompanyDto company)
+    {
+        (bool success, string error) = await _companyService.Insert(company);
+
+        var result = new InsertResult { Id = company.CompanyId, Error = error, Success = success };
+
+        return success ? Ok(result) : BadRequest(result);
+    }
+
+    [HttpDelete, Route("id/{id}")]
+    public async Task<IActionResult> Delete(int id)
+    {
+        (bool success, string error) = await _companyService.Remove(id);
+
+        return success ? Ok() : BadRequest(error);
     }
 }

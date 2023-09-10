@@ -1,5 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
+using StockWallet.Domain.Models.Dtos;
 using StockWallet.Domain.Services.Interfaces;
+using StockWallet.Models;
 
 namespace StockWallet.Controllers;
 
@@ -13,9 +15,29 @@ public class StockEventController : ControllerBase
         _eventService = stockEventService;
     }
     
-    // GET
-    public IActionResult Index()
+    [HttpGet, Route("wallet/id/{id}"), Produces("application/json", Type = typeof(List<StockEventDto>))]
+    public async Task<IActionResult> Wallet(int id)
     {
-        return Ok();
+        (List<StockEventDto> stockEvents, string _) = await _eventService.AllWallet(id);
+        
+        return Ok(stockEvents);
+    }
+    
+    [HttpGet, Route("company/id/{id}"), Produces("application/json", Type = typeof(List<StockEventDto>))]
+    public async Task<IActionResult> Company(int id)
+    {
+        (List<StockEventDto> stockEvents, string _) = await _eventService.AllCompany(id);
+        
+        return Ok(stockEvents);
+    }
+
+    [HttpPost, Produces("application/json", Type = typeof(InsertResult))]
+    public async Task<IActionResult> Post([FromBody] StockEventDto stockEvent)
+    {
+        (bool success, string error) = await _eventService.Insert(stockEvent);
+
+        var result = new InsertResult { Success = success, Error = error, Id = stockEvent.EventId};
+        
+        return success ? Ok(result) : BadRequest(result);
     }
 }

@@ -1,4 +1,5 @@
 using StockWallet.Domain.Infraestructure;
+using StockWallet.Domain.Models.Dtos;
 using StockWallet.Domain.Models.Serivces;
 using StockWallet.Domain.Services.Interfaces;
 
@@ -13,18 +14,40 @@ public class SummaryService: ISummaryService
         _summaryRepository = summaryRepository;
     }
 
-    public Task<(StockSummary summary, string error)> Get(int id)
+    public async Task<(SummaryDto summary, string error)> Get(int id)
     {
-        return _summaryRepository.Get(id);
+        (StockSummary summary, string error) = await _summaryRepository.Get(id);
+
+        var dto = new SummaryDto();
+
+        if (!string.IsNullOrEmpty(error)) return (dto, error);
+
+        dto.SummaryId = summary.SummaryId;
+        dto.WalletId = summary.WalletId;
+        dto.CompanyId = summary.CompanyId;
+        dto.AveragePrice = summary.AveragePrice;
+        dto.Quantity = summary.Quantity;
+        
+        return (dto, error);
     }
 
-    public Task<(List<StockSummary> summaries, string error)> All(int walletId)
+    public async Task<(List<SummaryDto> summaries, string error)> All(int walletId)
     {
-        return _summaryRepository.All(walletId);
-    }
+        (List<StockSummary> summaries, string error) = await _summaryRepository.All(walletId);
 
-    public Task<(bool success, string error)> Insert(StockSummary item)
-    {
-        return _summaryRepository.Insert(item);
+        var dtos = new List<SummaryDto>(summaries.Count);
+
+        if (!string.IsNullOrEmpty(error)) return (dtos, error);
+        
+        dtos.AddRange(summaries.Select(x => new SummaryDto
+        {
+            SummaryId = x.SummaryId,
+            WalletId = x.WalletId,
+            CompanyId = x.CompanyId,
+            Quantity = x.Quantity,
+            AveragePrice = x.AveragePrice
+        }));
+        
+        return (dtos, error);
     }
 }

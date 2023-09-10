@@ -1,11 +1,11 @@
-using StockWallet.Domain.Models;
+using StockWallet.Domain.Models.Dtos;
 
 namespace StockWallet.Domain.Services.Interfaces;
 
 public interface ICompanyService
 {
-    Task<(Company company, string error)> Get(int id);
+    Task<(CompanyDto company, string error)> Get(int id);
     Task<(bool success, string error)> Remove(int id);
-    Task<(bool success, string error)> Insert(Company item);
-    Task<(List<Company> companies, string error)> All();
+    Task<(bool success, string error)> Insert(CompanyDto item);
+    Task<(List<CompanyDto> companies, string error)> All();
 }

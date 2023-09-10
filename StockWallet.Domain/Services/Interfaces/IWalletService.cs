@@ -1,11 +1,11 @@
-using StockWallet.Domain.Models;
+using StockWallet.Domain.Models.Dtos;
 
 namespace StockWallet.Domain.Services.Interfaces;
 
 public interface IWalletService
 {
-    Task<(Wallet wallet, string error)> Get(int id);
+    Task<(WalletDto wallet, string error)> Get(int id);
     Task<(bool success, string error)> Delete(int id);
-    Task<(List<Wallet> wallets, string error)> All();
-    Task<(bool success, string error)> Insert(Wallet item);
+    Task<(List<WalletDto> wallets, string error)> All();
+    Task<(bool success, string error)> Insert(WalletDto item);
 }
