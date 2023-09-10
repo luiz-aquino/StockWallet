@@ -1,4 +1,5 @@
 using StockWallet.Domain.Infraestructure;
+using StockWallet.Domain.Models;
 using StockWallet.Domain.Models.Dtos;
 using StockWallet.Domain.Models.Serivces;
 using StockWallet.Domain.Services.Interfaces;
@@ -8,10 +9,14 @@ namespace StockWallet.Domain.Services;
 public class SummaryService: ISummaryService
 {
     private readonly ISummaryRepository _summaryRepository;
+    private readonly IWalletRepository _walletRepository;
+    private readonly IEventRepository _eventRepository;
     
-    public SummaryService(ISummaryRepository summaryRepository)
+    public SummaryService(ISummaryRepository summaryRepository, IWalletRepository walletRepository, IEventRepository eventRepository)
     {
         _summaryRepository = summaryRepository;
+        _walletRepository = walletRepository;
+        _eventRepository = eventRepository;
     }
 
     public async Task<(SummaryDto summary, string error)> Get(int id)
@@ -49,5 +54,49 @@ public class SummaryService: ISummaryService
         }));
         
         return (dtos, error);
+    }
+
+    public async Task<(bool success, string error)> Process()
+    {
+        bool success = true;
+        string error = string.Empty;
+
+        (List<Wallet> wallets, string _) = await _walletRepository.All();
+
+        foreach (var wallet in wallets)
+        {
+            (List<int> companies, string _) = await _eventRepository.WalletCompanies(wallet.WalletId);
+
+            (List<StockSummary> summaries, string _) = await _summaryRepository.All(wallet.WalletId);
+
+            var filters = companies.Select(x => new StockEventFilter
+            {
+                CompanyId = x,
+                LastEventId = summaries.Where(s => s.CompanyId == x)
+                    .Select(s => s.LastProcessedId)
+                    .FirstOrDefault()
+            }).ToList();
+
+            (List<StockEvent> stockEvents, string _) = await _eventRepository.WalletEvents(wallet.WalletId, filters);
+
+            var updatedSummaries = new List<StockSummary>(companies.Count);
+            var summariesToInsert = new List<StockSummary>(companies.Count);
+            foreach (var companyId in companies)
+            {
+                StockSummary summary = summaries.FirstOrDefault(x => x.CompanyId == companyId) ?? new StockSummary
+                {
+                    WalletId = wallet.WalletId,
+                    CompanyId = companyId,
+                    CreatedAt = DateTime.Now
+                };
+
+                List<StockEvent> currentEvents = stockEvents.Where(x => x.CompanyId == companyId).ToList();
+                
+                
+            }
+
+        } 
+        
+        return (success, error);
     }
 }

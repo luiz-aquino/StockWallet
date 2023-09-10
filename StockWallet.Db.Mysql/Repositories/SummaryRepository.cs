@@ -40,7 +40,7 @@ public class SummaryRepository: ISummaryRepository
         {
             summaries = await _context.Summaries.Where(x => x.WalletId == walletId)
                 .OrderByDescending(x => x.CompanyId)
-                .ThenBy(x => x.CreatedAt)
+                .ThenBy(x => x.SummaryId)
                 .GroupBy(x => x.CompanyId)
                 .Select(x => x.First())
                 .ToListAsync();

@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StockWallet.Domain.Infraestructure;
 using StockWallet.Domain.Models;
+using StockWallet.Domain.Models.Serivces;
 
 namespace StockWallet.Db.Mysql.Repositories;
 
@@ -102,5 +103,44 @@ public class EventRepository: IEventRepository
         }
 
         return (string.IsNullOrEmpty(error), error);
+    }
+
+    public async Task<(List<int> companies, string error)> WalletCompanies(int walletId)
+    {
+        string error = string.Empty;
+        var companies = new List<int>(0);
+        
+        try
+        {
+            companies = await _context.StockEvents.Where(x => x.WalletId == walletId)
+                .Select(x => x.CompanyId)
+                .Distinct()
+                .ToListAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+
+        return (companies, error);
+    }
+
+    public async Task<(List<StockEvent> stockEvents, string error)> WalletEvents(int walletId, List<StockEventFilter> filters)
+    {
+        string error = string.Empty;
+        var stockEvents = new List<StockEvent>(0);
+
+        try
+        {
+            stockEvents = await _context.StockEvents.Where(x =>
+                    x.WalletId == walletId && filters.Any(f => f.CompanyId == x.CompanyId && f.LastEventId < x.EventId))
+                .ToListAsync();
+        }
+        catch (Exception e)
+        {
+            error = e.Message;
+        }
+
+        return (stockEvents, error);
     }
 }

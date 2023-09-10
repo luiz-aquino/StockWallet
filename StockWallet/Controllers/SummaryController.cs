@@ -21,4 +21,12 @@ public class SummaryController : ControllerBase
         
         return Ok(summaries);
     }
+
+    [HttpPost, Route("process")]
+    public async Task<IActionResult> Process()
+    {
+        (bool success, string error) = await _summaryService.Process();
+
+        return success ? Ok() : BadRequest(error);
+    }
 }
