@@ -34,6 +34,8 @@ public class StockEventController : ControllerBase
     [HttpPost, Produces("application/json", Type = typeof(InsertResult))]
     public async Task<IActionResult> Post([FromBody] StockEventDto stockEvent)
     {
+        if (!ModelState.IsValid) return BadRequest();
+        
         (bool success, string error) = await _eventService.Insert(stockEvent);
 
         var result = new InsertResult { Success = success, Error = error, Id = stockEvent.EventId};

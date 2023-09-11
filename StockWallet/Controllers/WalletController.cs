@@ -34,6 +34,8 @@ public class WalletController : ControllerBase
     [HttpPost, Produces("application/json", Type = typeof(InsertResult))]
     public async Task<IActionResult> Post([FromBody] WalletDto wallet)
     {
+        if (!ModelState.IsValid) return BadRequest();
+        
         (bool success, string error) = await _walletService.Insert(wallet);
 
         var result = new InsertResult { Success = success, Error = error, Id = wallet.WalletId };

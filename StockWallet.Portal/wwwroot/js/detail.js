@@ -17,6 +17,7 @@ var detail = (function (){
         infoModal: new bootstrap.Modal(document.getElementById('mdInfo'), {}),
         modalCompany: new bootstrap.Modal(document.getElementById('mdCompany'), {}),
         selectCompany: 0,
+        clearTagsRegex: /<[^>]*(>|$)/g,
         init: function () {
             this.ui.init();
             this.events.init();
@@ -26,7 +27,12 @@ var detail = (function (){
         },
         ui: {
             init: function () {
-                
+                this.inputMask();
+            },
+            inputMask: function () {
+                $('#companyDoc').inputmask('99.999.999/9999-99');
+                $('#eventQty').inputmask('integer', { allowMinus: false, min: 1, unmaskAsNumber: true });
+                $('#eventPrice').inputmask('currency', { radixPoint: ',', allowMinus: false, min:0.1, unmaskAsNumber: true });
             }
         },
         events: {
@@ -73,12 +79,14 @@ var detail = (function (){
             onClickSave: function () {
                 $('#btnSave').off('click').on('click', function (){
                      
+                    if(!api.methods.isEventValid()) return;
+                    
                     let eventObj = {
                         walletId: parseInt(api.walletId),
                         companyId: parseInt($('#eventCompany').val()),
                         eventType: parseInt($('#eventType').val()),
-                        quantity: parseInt($('#eventQty').val()),
-                        price: parseFloat($('#eventPrice').val())
+                        quantity: $('#eventQty').inputmask('unmaskedvalue'),
+                        price: $('#eventPrice').inputmask('unmaskedvalue')
                     };
 
                     api.modalAdd.hide();
@@ -132,12 +140,14 @@ var detail = (function (){
             },
             onClickSaveCompany: function () {
                 $('#btnSaveCompany').off('click').on('click', function () {
+                    if(!api.methods.isCompanyValid()) return;
+                    
                     api.modalCompany.hide();
                     api.loadingModal.show();
                     
                     let companyObj = {
                         identification: $('#companyDoc').val(),
-                        name: $('#companyName').val()
+                        name: $('#companyName').val().replace(api.clearTagsRegex, '')
                     };
                     
                     $.ajax({
@@ -249,6 +259,11 @@ var detail = (function (){
                     success: function (result) {
                         api.companies = result;
 
+                        for (let i = 0; i < api.companies.length; i++) {
+                            let company = api.companies[i];
+                            company.name = company.name.replace(api.clearTagsRegex, '');
+                        }
+                        
                         api.methods.updateSummaryCompany();
                         api.methods.updateEventCompany();
                         api.methods.loadCompanySelect();
@@ -289,7 +304,7 @@ var detail = (function (){
                 })
             },
             loadCompanySelect: function () {
-                let options = '';
+                let options = '<option value="">Selecione</option>';
                 
                 for (let i = 0; i < api.companies.length; i++)
                 {
@@ -301,6 +316,58 @@ var detail = (function (){
                 slCompany.val('')
                 slCompany.html(options);
                 if(api.selectCompany) slCompany.val(api.selectCompany)
+            },
+            isEventValid: function () {
+                let valid = true;
+                
+                let company = $('#eventCompany');
+                if(company.val()) 
+                    company.removeClass("is-invalid");
+                else {
+                    company.addClass("is-invalid");
+                    valid = false;
+                }
+                
+                let qty = $('#eventQty');
+                
+                if(parseInt(qty.val())) 
+                    qty.removeClass("is-invalid");
+                else {
+                    qty.addClass("is-invalid");
+                    valid = false;
+                }                
+                
+                let price = $('#eventPrice');
+                
+                if(parseFloat(price.val()))
+                    price.removeClass("is-invalid");
+                else {
+                    price.addClass("is-invalid");
+                    valid = false;
+                }
+                
+                return valid;
+            },
+            isCompanyValid: function () {
+                let valid = true;
+                
+                let document = $('#companyDoc');
+                
+                if(document.val())
+                    document.removeClass("is-invalid");
+                else {
+                    document.addClass("is-invalid");
+                    valid = false;
+                }
+                
+                let nome = $('#companyName');
+                
+                if(nome.val())
+                    nome.removeClass("is-invalid");
+                else 
+                    nome.addClass("is-invalid");
+                
+                return valid;
             }
         }
     }

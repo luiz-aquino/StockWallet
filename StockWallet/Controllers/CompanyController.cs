@@ -34,6 +34,8 @@ public class CompanyController : ControllerBase
     [HttpPost, Produces("application/Json", Type = typeof(InsertResult))]
     public async Task<IActionResult> Post([FromBody] CompanyDto company)
     {
+        if (!ModelState.IsValid) return BadRequest();
+        
         (bool success, string error) = await _companyService.Insert(company);
 
         var result = new InsertResult { Id = company.CompanyId, Error = error, Success = success };

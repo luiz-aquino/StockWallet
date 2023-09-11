@@ -11,6 +11,7 @@ var wallet = function () {
         infoModal: new bootstrap.Modal(document.getElementById('mdInfo'), {}),
         addModal: new bootstrap.Modal(document.getElementById('mdNovo'), {}),
         confirmModel: new bootstrap.Modal(document.getElementById('mdConfirm'), {}),
+        clearTagsRegex: /<[^>]*(>|$)/g,
         init: function () {
             this.ui.init();
             this.events.init();
@@ -38,10 +39,12 @@ var wallet = function () {
             onClickSave: function () {
                 $('#btnSave').off('click').on('click', function () {
 
+                    if(!api.methods.isWalletValid()) return;
+                    
                     api.addModal.hide();
                     api.loadingModal.show();
 
-                    let walletName = $('#walletName').val();
+                    let walletName = $('#walletName').val().replace(api.clearTagsRegex, '');
 
                     $.ajax({
                         url: api.routes.add,
@@ -135,7 +138,7 @@ var wallet = function () {
                             $(newRow).addClass('walletTr');
 
                             $('.tdRadio input', newRow).data('id', item.walletId);
-                            $('.tdName', newRow).html(item.name);
+                            $('.tdName', newRow).html(item.name.replace(api.clearTagsRegex, ''));
 
                             $('#tbWallets tbody').append(newRow);
                         }
@@ -158,6 +161,19 @@ var wallet = function () {
             },
             clearForm: function () {
                 $('#walletName').val('');
+            },
+            isWalletValid: function () {
+                let valid = true;
+                
+                let name = $('#walletName');
+                if(name.val())
+                    name.removeClass('is-invalid');
+                else {
+                    name.addClass('is-invalid');
+                    valid = false;
+                } 
+                
+                return valid;
             }
         }
     }
