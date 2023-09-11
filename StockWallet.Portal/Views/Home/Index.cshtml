@@ -1,8 +1,31 @@
-﻿@{
+﻿@model List<WalletTotal>
+
+@{
     ViewData["Title"] = "Home Page";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-</div>
+@if (!Model.Any())
+{
+    <div class="text-center">
+        <h1 class="display-4">Bem vindo</h1>
+        <p>Você não tem carteiras registradas, bora criar algumas</p>
+        <a class="btn btn-primary" href="/Wallet">Vamos lá!</a>
+    </div>
+}
+else
+{
+    <div class="row">
+        @foreach (var total in Model)
+        {
+            <div class="col-4">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h5 class="card-title">@total.Name</h5>
+                        <p class="card-text">R$ @(total.Total.ToString("N2").Replace(".", ";").Replace(",", ".").Replace(";", ","))</p>
+                        <a href="/Wallet/Detalhar/@(total.WalletId)" class="btn btn-primary">Detalhes</a>
+                    </div>    
+                </div>
+            </div>
+        }
+    </div>
+}

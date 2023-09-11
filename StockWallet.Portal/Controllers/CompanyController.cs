@@ -45,6 +45,8 @@ public class CompanyController : Controller
     [HttpPost]
     public async Task<IActionResult> Insert([FromBody] CompanyDto item)
     {
+        if (!ModelState.IsValid) return BadRequest();
+        
         var result = await _apiClient.PostAsJsonAsync("Company", item);
 
         if (result.IsSuccessStatusCode)

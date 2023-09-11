@@ -44,6 +44,8 @@ public class StockEventController : Controller
     [HttpPost]
     public async Task<IActionResult> Insert([FromBody] StockEventDto eventDto)
     {
+        if (!ModelState.IsValid) return BadRequest();
+        
         var result = await _apiClient.PostAsJsonAsync("StockEvent", eventDto);
 
         if (result.IsSuccessStatusCode)

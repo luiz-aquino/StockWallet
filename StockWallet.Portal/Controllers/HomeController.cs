@@ -1,22 +1,49 @@
 ﻿using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using StockWallet.Portal.Models;
+using StockWallet.Portal.Models.Dtos;
 
 namespace StockWallet.Portal.Controllers;
 
 public class HomeController : Controller
 {
     private readonly ILogger<HomeController> _logger;
-
-    public HomeController(ILogger<HomeController> logger)
+    private readonly HttpClient _apiClient;
+    public HomeController(ILogger<HomeController> logger, IHttpClientFactory httpFactory)
     {
         _logger = logger;
+        _apiClient = httpFactory.CreateClient("walletApi");
     }
 
     [HttpGet]
-    public IActionResult Index()
+    public async Task<IActionResult> Index()
     {
-        return View();
+        var wallets = new List<WalletDto>(0);
+        
+        var walletsResult = await _apiClient.GetAsync("/Wallet/all");
+
+        if (walletsResult.IsSuccessStatusCode)
+        {
+            wallets = await walletsResult.Content.ReadFromJsonAsync<List<WalletDto>>() ?? new List<WalletDto>(0);
+        }
+
+        var totals = new List<WalletTotal>(wallets.Count);
+
+        foreach (var wallet in wallets)
+        {
+            var summaryResult = await _apiClient.GetAsync($"/Summary/wallet/id/{wallet.WalletId}");
+
+            var walletTotal = new WalletTotal { WalletId = wallet.WalletId, Name = wallet.Name };
+            totals.Add(walletTotal);
+            
+            if (!summaryResult.IsSuccessStatusCode) continue;
+            
+            var summaries = await summaryResult.Content.ReadFromJsonAsync<List<SummaryDto>>() ?? new List<SummaryDto>();
+
+            walletTotal.Total = Math.Round(summaries.Sum(x => x.Total), 2, MidpointRounding.ToEven);
+        }
+        
+        return View(totals);
     }
 
     [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
