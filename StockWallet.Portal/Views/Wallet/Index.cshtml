@@ -1,0 +1,56 @@
+@{
+    ViewBag.Title = "Carteiras";
+    Layout = "_Layout";
+}
+
+<div class="row py-4">
+    <div class="col px-0">
+        <button type="button" class="btn btn-primary" id="btnAdd">Novo </button>
+        <button type="button" class="btn btn-info" id="btnDisplay">Detalhar</button>
+        <button type="button" class="btn btn-danger" id="btnRemove">Excluir</button>
+    </div>
+</div>
+
+<div class="row py-2">
+    <table class="table table-bordered table-striped" id="tbWallets">
+        <thead>
+        <tr>
+            <th class="col-1"></th> <th>Nome</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr class="sampleRow d-none">
+            <td class="tdRadio text-center"><input type="radio" class="form-check-input" name="walletRadio"/></td>
+            <td class="tdName"></td>
+        </tr>
+        </tbody>
+    </table>
+</div>
+
+<div class="modal fade" id="mdNovo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="mdNovoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mdNovoLabel">Nova Carteira</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="row g-3">
+                    <label for="walletName" class="col-sm-2 col-form-label">Nome</label>
+                    <div class="col-10">
+                        <input type="text" class="form-control-plaintext" id="walletName" placeholder="Renda Fixa"/>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnSave">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts
+{
+    <script src="~/js/wallet.js"></script>
+}

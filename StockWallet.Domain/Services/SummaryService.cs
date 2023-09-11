@@ -30,7 +30,7 @@ public class SummaryService: ISummaryService
         dto.SummaryId = summary.SummaryId;
         dto.WalletId = summary.WalletId;
         dto.CompanyId = summary.CompanyId;
-        dto.AveragePrice = summary.AveragePrice;
+        dto.AveragePrice = Math.Round(summary.AveragePrice, 2, MidpointRounding.ToEven);
         dto.Quantity = summary.Quantity;
         
         return (dto, error);
@@ -50,7 +50,7 @@ public class SummaryService: ISummaryService
             WalletId = x.WalletId,
             CompanyId = x.CompanyId,
             Quantity = x.Quantity,
-            AveragePrice = x.AveragePrice
+            AveragePrice = Math.Round( x.AveragePrice, 2, MidpointRounding.ToEven)
         }));
         
         return (dtos, error);
@@ -83,15 +83,15 @@ public class SummaryService: ISummaryService
                         CreatedAt = DateTime.Now
                     };
 
-                    List<StockEvent> currentEvents = stockEvents.Where(x => x.CompanyId == companyId).ToList();
+                    List<StockEvent> currentEvents = stockEvents.Where(x => x.CompanyId == companyId && x.EventId > summary.LastProcessedId).ToList();
 
                     int quantity = currentEvents.Sum(x => x.Quantity);
                     decimal totalPrice = currentEvents.Sum(x => x.Price * x.Quantity);
                     
-                    summary.AveragePrice = (summary.AveragePrice * summary.Quantity) + (totalPrice) / (quantity + summary.Quantity);
+                    summary.AveragePrice = ((summary.AveragePrice * summary.Quantity) + (totalPrice)) / (quantity + summary.Quantity);
                     summary.Quantity += quantity;
 
-                    summary.LastProcessedId = currentEvents.OrderBy(x => x.EventId).Select(x => x.EventId).LastOrDefault();
+                    if(currentEvents.Any()) summary.LastProcessedId = currentEvents.OrderBy(x => x.EventId).Select(x => x.EventId).LastOrDefault();
                     
                     if (summary.SummaryId == 0)
                     {

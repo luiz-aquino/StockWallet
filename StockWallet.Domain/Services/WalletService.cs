@@ -20,7 +20,7 @@ public class WalletService: IWalletService
 
         var dto = new WalletDto();
 
-        if (string.IsNullOrEmpty(error)) return (dto, error);
+        if (!string.IsNullOrEmpty(error)) return (dto, error);
 
         dto.WalletId = wallet.WalletId;
         dto.Name = wallet.Name;

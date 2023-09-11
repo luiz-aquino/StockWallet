@@ -8,4 +8,6 @@ public class StockEventDto
     public EventType EventType { get; set; }
     public int Quantity { get; set; }
     public decimal Price { get; set; }
+
+    public decimal Total => Math.Round(Quantity * Price, 2, MidpointRounding.ToEven);
 }

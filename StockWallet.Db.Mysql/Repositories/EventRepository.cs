@@ -134,7 +134,7 @@ public class EventRepository: IEventRepository
         {   
             stockEvents = await _context.StockEvents.Where(x =>
                     x.WalletId == walletId && companies.Contains(x.CompanyId) 
-                                           && !x.Wallet.Summaries.Any(s => s.CompanyId == x.CompanyId && s.LastProcessedId == x.EventId))
+                                           && x.Wallet.Summaries.Count(s => s.CompanyId == x.CompanyId && s.LastProcessedId <= x.EventId) == 0)
                 .ToListAsync();
         }
         catch (Exception e)

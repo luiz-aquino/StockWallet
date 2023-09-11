@@ -24,7 +24,7 @@ public class StockEventController : Controller
 
         if (!result.IsSuccessStatusCode) return BadRequest();
 
-        var stockEvents = await result.Content.ReadFromJsonAsync<StockEventDto>();
+        var stockEvents = await result.Content.ReadFromJsonAsync<List<StockEventDto>>();
 
         return Ok(stockEvents);
     }

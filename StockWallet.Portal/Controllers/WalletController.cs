@@ -11,10 +11,23 @@ public class WalletController : Controller
     {
         _apiClient = httpFactory.CreateClient("walletApi");
     }
-    // GET
+    
+    [HttpGet]
     public IActionResult Index()
     {
         return View();
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Detalhar(int id)
+    {
+        var result = await _apiClient.GetAsync($"Wallet/id/{id}");
+        
+        if (!result.IsSuccessStatusCode) return BadRequest();
+
+        WalletDto wallet = await result.Content.ReadFromJsonAsync<WalletDto>() ?? new WalletDto();
+        
+        return View(wallet);
     }
 
     [HttpGet]
@@ -42,8 +55,10 @@ public class WalletController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Insert(WalletDto wallet)
+    public async Task<IActionResult> Insert([FromBody] WalletDto wallet)
     {
+        if (!ModelState.IsValid) return BadRequest();
+        
         var result = await _apiClient.PostAsJsonAsync("Wallet", wallet);
 
         if (result.IsSuccessStatusCode) return Ok();
