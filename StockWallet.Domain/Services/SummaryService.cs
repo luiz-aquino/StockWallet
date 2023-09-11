@@ -1,5 +1,6 @@
 using StockWallet.Domain.Infraestructure;
 using StockWallet.Domain.Models;
+using StockWallet.Domain.Models.Contols;
 using StockWallet.Domain.Models.Dtos;
 using StockWallet.Domain.Models.Serivces;
 using StockWallet.Domain.Services.Interfaces;
@@ -86,7 +87,7 @@ public class SummaryService: ISummaryService
                     List<StockEvent> currentEvents = stockEvents.Where(x => x.CompanyId == companyId && x.EventId > summary.LastProcessedId).ToList();
 
                     int quantity = currentEvents.Sum(x => x.Quantity);
-                    decimal totalPrice = currentEvents.Sum(x => x.Price * x.Quantity);
+                    decimal totalPrice = currentEvents.Sum(x => x.Price * x.Quantity * (x.EventType == EventType.Buy ? 1 : -1));
                     
                     summary.AveragePrice = ((summary.AveragePrice * summary.Quantity) + (totalPrice)) / (quantity + summary.Quantity);
                     summary.Quantity += quantity;

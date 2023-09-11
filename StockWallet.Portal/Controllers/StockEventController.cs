@@ -41,12 +41,17 @@ public class StockEventController : Controller
         return Ok(stockEvents);
     }
 
-    [HttpGet]
-    public async Task<IActionResult> Insert(StockEventDto eventDto)
+    [HttpPost]
+    public async Task<IActionResult> Insert([FromBody] StockEventDto eventDto)
     {
         var result = await _apiClient.PostAsJsonAsync("StockEvent", eventDto);
 
-        if (result.IsSuccessStatusCode) return Ok();
+        if (result.IsSuccessStatusCode)
+        {
+            var insertResult = await result.Content.ReadFromJsonAsync<InsertResult>();
+            
+            return Ok(insertResult);
+        }
 
         var message = await result.Content.ReadAsStringAsync();
 

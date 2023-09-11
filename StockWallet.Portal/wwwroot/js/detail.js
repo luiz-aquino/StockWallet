@@ -7,10 +7,16 @@ var detail = (function (){
             summary: "/Summary/Wallet/" + walletId,
             events: "/StockEvent/Wallet/" + walletId,
             companies: "/Company/All",
-            summaryuRun: "/Summary/Process"
+            summaryuRun: "/Summary/Process",
+            saveEvent: "/StockEvent/Insert",
+            saveCompany: "/Company/Insert"
         },
         companies: [],
         loadingModal: new bootstrap.Modal(document.getElementById('mdLoading'), {}),
+        modalAdd: new bootstrap.Modal(document.getElementById('mdNovo'), {}),
+        infoModal: new bootstrap.Modal(document.getElementById('mdInfo'), {}),
+        modalCompany: new bootstrap.Modal(document.getElementById('mdCompany'), {}),
+        selectCompany: 0,
         init: function () {
             this.ui.init();
             this.events.init();
@@ -26,6 +32,11 @@ var detail = (function (){
         events: {
             init: function () {
                 this.onClickConsolidate();
+                this.onClickAdd();
+                this.onClickSave();
+                this.onClickAddCompany();
+                this.onCancelCompany();
+                this.onClickSaveCompany();
             },
             onClickConsolidate: function () {
                 $('#btnConsolidate').off('click').on('click', function () {
@@ -52,6 +63,103 @@ var detail = (function (){
                         }
                     })
                 });
+            },
+            onClickAdd: function () {
+                $('#btnAdd').off('click').on('click', function (){
+                    $('#frmEvent').trigger('reset');
+                   api.modalAdd.show();
+                });
+            },
+            onClickSave: function () {
+                $('#btnSave').off('click').on('click', function (){
+                     
+                    let eventObj = {
+                        walletId: parseInt(api.walletId),
+                        companyId: parseInt($('#eventCompany').val()),
+                        eventType: parseInt($('#eventType').val()),
+                        quantity: parseInt($('#eventQty').val()),
+                        price: parseFloat($('#eventPrice').val())
+                    };
+
+                    api.modalAdd.hide();
+                    api.loadingModal.show();
+                    
+                    $.ajax({
+                        url: api.routes.saveEvent,
+                        type: 'POST',
+                        contentType: 'application/json; charset=UTF-8;',
+                        data: JSON.stringify(eventObj),
+                        success: function () {
+                            
+                            $('#tbEvents').addClass('d-none');
+                            $('#loading-event').removeClass('d-none');
+
+                            $('#tbEvents .eventTr').remove();
+                            
+                            api.methods.loadEvents();
+                            
+                            $('#mdInfoLabel').html("Aviso");
+                            
+                            $('#mdInfoBody').html('<p> Novas movimentações precisam ser consolidadas, para refletir no total da aba consolidado. </p>')
+                            
+                            setTimeout(function (){
+                                api.infoModal.show();
+                            }, 600);
+                        },
+                        error: function (error) {
+                            console.log('error', error);
+                        },
+                        complete: function () {
+                            setTimeout(function () {
+                                api.loadingModal.hide();
+                            }, 600);
+                        }
+                    })
+                });
+            },
+            onClickAddCompany: function () {
+                $('#btnAddCompany').off('click').on('click', function (){
+                    $('#frmCompany').trigger('reset');
+                    api.modalCompany.show();
+                    api.modalAdd.hide();
+                });
+            },
+            onCancelCompany: function () {
+                $('#btnCompanyDismiss').off('click').on('click', function () {
+                    api.modalCompany.hide();
+                    api.modalAdd.show();
+                });
+            },
+            onClickSaveCompany: function () {
+                $('#btnSaveCompany').off('click').on('click', function () {
+                    api.modalCompany.hide();
+                    api.loadingModal.show();
+                    
+                    let companyObj = {
+                        identification: $('#companyDoc').val(),
+                        name: $('#companyName').val()
+                    };
+                    
+                    $.ajax({
+                        url: api.routes.saveCompany,
+                        type: 'POST',
+                        contentType: 'application/json; charset=UTF-8;',
+                        data: JSON.stringify(companyObj),
+                        success: function (result) {
+                            api.methods.loadCompanies();
+                            
+                            api.selectCompany = result.id;
+                            
+                            setTimeout(function () {
+                                api.loadingModal.hide();
+                                api.modalAdd.show();
+                            }, 600);
+                        },
+                        error: function (error) {
+                            console.log('error', error)
+                        }
+                    })
+                })
             }
         },
         methods: {
@@ -143,6 +251,7 @@ var detail = (function (){
 
                         api.methods.updateSummaryCompany();
                         api.methods.updateEventCompany();
+                        api.methods.loadCompanySelect();
                     },
                     error: function () {
                         
@@ -178,6 +287,20 @@ var detail = (function (){
                         }
                     }
                 })
+            },
+            loadCompanySelect: function () {
+                let options = '';
+                
+                for (let i = 0; i < api.companies.length; i++)
+                {
+                    let company = api.companies[i];
+                    options += `<option value="${company.companyId}">${company.name} (${company.identification})</option>>`
+                }
+                
+                let slCompany = $('#eventCompany');
+                slCompany.val('')
+                slCompany.html(options);
+                if(api.selectCompany) slCompany.val(api.selectCompany)
             }
         }
     }

@@ -61,7 +61,12 @@ public class WalletController : Controller
         
         var result = await _apiClient.PostAsJsonAsync("Wallet", wallet);
 
-        if (result.IsSuccessStatusCode) return Ok();
+        if (result.IsSuccessStatusCode)
+        {
+            var insertResult = await result.Content.ReadFromJsonAsync<InsertResult>();
+            
+            return Ok(insertResult);
+        }
 
         var message= await result.Content.ReadAsStringAsync();
 

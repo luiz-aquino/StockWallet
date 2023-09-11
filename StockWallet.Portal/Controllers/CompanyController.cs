@@ -43,11 +43,16 @@ public class CompanyController : Controller
     }
 
     [HttpPost]
-    public async Task<IActionResult> Insert(CompanyDto item)
+    public async Task<IActionResult> Insert([FromBody] CompanyDto item)
     {
         var result = await _apiClient.PostAsJsonAsync("Company", item);
 
-        if (result.IsSuccessStatusCode) return Ok();
+        if (result.IsSuccessStatusCode)
+        {
+            var insertResult = await result.Content.ReadFromJsonAsync<InsertResult>();
+            
+            return Ok(insertResult);
+        }
 
         var message = result.Content.ReadAsStringAsync();
 

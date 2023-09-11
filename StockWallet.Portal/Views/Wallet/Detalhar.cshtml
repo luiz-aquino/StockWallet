@@ -79,6 +79,87 @@
     </div>
 </div>
 
+<div class="modal fade" id="mdNovo" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="mdNovoLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mdNovoLabel">Novo Evento</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="g-3" id="frmEvent">
+                    <div class="row mb-3">
+                        <label for="eventType" class="col-sm-3 col-form-label">Tipo</label>
+                        <div class="col-9">
+                            <select class="form-select" id="eventType">
+                                <option value="0" selected="">Compra</option>
+                                <option value="1">Venda</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mb-3">
+                        <label for="eventCompany" class="col-sm-3 col-form-label">Empresa</label>
+                        <div class="col-7">
+                            <select class="form-select" id="eventCompany"></select>
+                        </div>
+                        <div class="col-2">
+                            <button type="button" class="btn btn-primary" id="btnAddCompany">Nova</button>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="eventQty" class="col-sm-3 col-form-label">Quantidade</label>
+                        <div class="col-9">
+                            <input type="number" min="1" max="9999" class="form-control" id="eventQty" placeholder="0"/>
+                        </div>
+                        
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="eventPrice" class="col-sm-3 col-form-label">Preço</label>
+                        <div class="col-9">
+                            <input type="number" class="form-control" id="eventPrice" placeholder="0.00"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnSave">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="mdCompany" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="mdCompanyLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="mdCompanyLabel">Nova Empresa</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form class="g-3" id="frmCompany">
+                    <div class="mb-3 row">
+                        <label for="companyDoc" class="col-sm-3 col-form-label">CNPJ</label>
+                        <div class="col-9">
+                            <input type="text" class="form-control-plaintext" id="companyDoc" placeholder="00.000.000/0000-00"/>
+                        </div>
+                    </div>
+                    <div class="mb-3 row">
+                        <label for="companyName" class="col-sm-3 col-form-label">Nome</label>
+                        <div class="col-9">
+                            <input type="text" class="form-control-plaintext" id="companyName" placeholder="Empresa A"/>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" id="btnCompanyDismiss">Cancelar</button>
+                <button type="button" class="btn btn-success" id="btnSaveCompany">Salvar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @section Scripts
 {
     <script src="~/js/detail.js"></script>
